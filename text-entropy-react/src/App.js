@@ -31,7 +31,12 @@ class App extends React.Component {
   openFile = async () => {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
-    this.setState({ text });
+    const charMap = countChars(text);
+    var formattedText = "";
+    charMap.forEach((frequency, char, _) => {
+      formattedText += `${char} : ${frequency} || `;
+    });
+    this.setState({ text : formattedText });
   }
 }
 
@@ -46,6 +51,17 @@ function readFileAsync(file) {
 
 function arrayBufferToString(arrayBuffer) {
   return new TextDecoder('utf-8').decode(arrayBuffer);
+}
+
+function countChars(fileContents) {
+  var charMap = new Map();
+  fileContents.split("").forEach(c => {
+    if (charMap.has(c))
+      charMap.set(c, charMap.get(c) + 1);
+    else
+      charMap.set(c, 1);
+  });
+  return charMap;
 }
 
 export default App;
