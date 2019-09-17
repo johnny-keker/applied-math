@@ -57,6 +57,7 @@ function arrayBufferToString(arrayBuffer) {
 function countChars(fileContents) {
   var charMap = new Map();
   fileContents.split("").forEach(c => {
+    c = c.toLowerCase();
     if (".,;?!:-".includes(c))    // TODO: do it better
       c = '.';
     if (charMap.has(c))
