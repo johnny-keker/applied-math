@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { async } from 'q';
+import { isPattern } from '@babel/types';
 
 class App extends React.Component {
   constructor(props) {
@@ -56,6 +57,8 @@ function arrayBufferToString(arrayBuffer) {
 function countChars(fileContents) {
   var charMap = new Map();
   fileContents.split("").forEach(c => {
+    if (".,;?!:-".includes(c))    // TODO: do it better
+      c = '.';
     if (charMap.has(c))
       charMap.set(c, charMap.get(c) + 1);
     else
