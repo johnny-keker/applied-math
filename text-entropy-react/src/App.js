@@ -32,9 +32,9 @@ class App extends React.Component {
   openFile = async () => {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
-    const charMap = countChars(text);
+    const probMap = countProbability(countChars(text));
     var formattedText = "";
-    charMap.forEach((frequency, char, _) => {
+    probMap.forEach((frequency, char, _) => {
       formattedText += `${char} : ${frequency} || `;
     });
     this.setState({ text : formattedText });
@@ -66,6 +66,16 @@ function countChars(fileContents) {
       charMap.set(c, 1);
   });
   return charMap;
+}
+
+function countProbability(charMap) {
+  var probMap = new Map();
+  var size = 0;
+  charMap.forEach((frequency, char, _) => size += frequency);
+  charMap.forEach((frequency, char, _) => {
+    probMap.set(char, frequency / size);
+  });
+  return probMap;
 }
 
 export default App;
