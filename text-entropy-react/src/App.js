@@ -21,8 +21,8 @@ class App extends React.Component {
           </div>
           <table className="table">
             <tbody>
-              <tr><th colspan="2">Probabilities</th></tr>
-                { Object.keys(this.state.probabilities).sort().map((key) => (<tr><td>{key}</td><td>{this.state.probabilities[key].toFixed(3)}</td></tr>)) }
+              <tr><th>Char</th><th>Prob</th><th>Entropy</th></tr>
+              { Object.keys(this.state.probabilities).sort().map((key) => (<tr><td>{key}</td><td>{this.state.probabilities[key].toFixed(4)}</td><td>{Math.log((1 / this.state.probabilities[key])).toFixed(4)}</td></tr>)) }
         </tbody>
       </table>
     </div>
@@ -56,9 +56,9 @@ function countChars(fileContents) {
   fileContents.split("").forEach(c => {
     c = c.toLowerCase();
     if (!c.match(/[a-z]/i) && c !== " ")
-      c = 'Punctuation';
+      c = 'Pnct';
     if (c == " ")
-      c = "Space";
+      c = "Spc";
     if (c == "\n")
       return;
     if (charMap[c] !== undefined)
