@@ -14,7 +14,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
           <div className="container">
           <div id="json-file-loader">
             <input type="file" ref="file" />
@@ -22,16 +21,10 @@ class App extends React.Component {
           </div>
           <table className="table">
             <tbody>
-              <tr>
-                { Object.entries(this.state.probabilities).map(([key, value]) => (<td>{key}</td>)) }
-              </tr>
-              <tr>
-                { Object.entries(this.state.probabilities).map(([key, value]) => (<td>{value.toFixed(3)}</td>)) }
-              </tr>
+                { Object.entries(this.state.probabilities).map(([key, value]) => (<tr><td>{key}</td><td>{value.toFixed(3)}</td></tr>)) }
         </tbody>
       </table>
     </div>
-        </header>
       </div>
     );
   }
@@ -63,6 +56,10 @@ function countChars(fileContents) {
     c = c.toLowerCase();
     if (".,;?!:-".includes(c))    // TODO: do it better
       c = 'Punctuation';
+    if (c == " ")
+      c = "Space";
+    if (c == "\n")
+      return;
     if (charMap[c] !== undefined)
       charMap[c]++;
     else
