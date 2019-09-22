@@ -7,7 +7,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       text: "",
-      probabilities: {}
+      charInfo: {}
     };
   }
 
@@ -22,7 +22,7 @@ class App extends React.Component {
           <table className="table">
             <tbody>
               <tr><th>Char</th><th>Prob</th><th>Entropy</th></tr>
-              { Object.keys(this.state.probabilities).sort().map((key) => (<tr><td>{key}</td><td>{this.state.probabilities[key].toFixed(4)}</td><td>{Math.log((1 / this.state.probabilities[key])).toFixed(4)}</td></tr>)) }
+              { Object.keys(this.state.charInfo).sort().map((key) => (<tr><td>{key}</td><td>{this.state.charInfo[key][0].toFixed(4)}</td><td>{this.state.charInfo[key][1].toFixed(4)}</td></tr>)) }
         </tbody>
       </table>
     </div>
@@ -33,8 +33,8 @@ class App extends React.Component {
   openFile = async () => {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
-    const probMap = countProbability(countChars(text));
-    this.setState({ probabilities : probMap });
+    const charInfo = getCharInfo(countChars(text));
+    this.setState({ charInfo });
   }
 }
 
@@ -69,11 +69,12 @@ function countChars(fileContents) {
   return charMap;
 }
 
-function countProbability(charMap) {
+function getCharInfo(charMap) {
   var probMap = {};
   const size = Object.values(charMap).reduce((a, b) => a + b, 0);
   Object.entries(charMap).forEach(([char, frequency]) => {
-    probMap[char] = frequency / size;
+    var prob = frequency / size;
+    probMap[char] = [prob, Math.log(1 / prob)];
   });
   return probMap;
 }
