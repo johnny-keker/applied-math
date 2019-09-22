@@ -55,7 +55,7 @@ function countChars(fileContents) {
   var charMap = {};
   fileContents.split("").forEach(c => {
     c = c.toLowerCase();
-    if (".,;?!:-'".includes(c))    // TODO: do it better
+    if (!c.match(/[a-z]/i) && c !== " ")
       c = 'Punctuation';
     if (c == " ")
       c = "Space";
