@@ -21,7 +21,7 @@ class App extends React.Component {
           </div>
           <table className="table">
             <tbody>
-                { Object.entries(this.state.probabilities).map(([key, value]) => (<tr><td>{key}</td><td>{value.toFixed(3)}</td></tr>)) }
+                { Object.keys(this.state.probabilities).sort().map((key) => (<tr><td>{key}</td><td>{this.state.probabilities[key].toFixed(3)}</td></tr>)) }
         </tbody>
       </table>
     </div>
@@ -54,7 +54,7 @@ function countChars(fileContents) {
   var charMap = {};
   fileContents.split("").forEach(c => {
     c = c.toLowerCase();
-    if (".,;?!:-".includes(c))    // TODO: do it better
+    if (".,;?!:-'".includes(c))    // TODO: do it better
       c = 'Punctuation';
     if (c == " ")
       c = "Space";
