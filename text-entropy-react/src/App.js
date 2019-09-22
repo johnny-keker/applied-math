@@ -1,14 +1,13 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { async } from 'q';
-import { isPattern } from '@babel/types';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       text: "",
+      probabilities: {}
     };
   }
 
@@ -16,14 +15,22 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            { this.state.text }
-        </p>
+          <div className="container">
           <div id="json-file-loader">
             <input type="file" ref="file" />
-          </div>
           <button onClick={this.openFile}>Load File</button>
+          </div>
+          <table className="table">
+            <tbody>
+              <tr>
+                { Object.entries(this.state.probabilities).map(([key, value]) => (<td>{key}</td>)) }
+              </tr>
+              <tr>
+                { Object.entries(this.state.probabilities).map(([key, value]) => (<td>{value.toFixed(3)}</td>)) }
+              </tr>
+        </tbody>
+      </table>
+    </div>
         </header>
       </div>
     );
@@ -33,11 +40,7 @@ class App extends React.Component {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
     const probMap = countProbability(countChars(text));
-    var formattedText = "";
-    probMap.forEach((frequency, char, _) => {
-      formattedText += `${char} : ${frequency} || `;
-    });
-    this.setState({ text : formattedText });
+    this.setState({ probabilities : probMap });
   }
 }
 
@@ -55,25 +58,24 @@ function arrayBufferToString(arrayBuffer) {
 }
 
 function countChars(fileContents) {
-  var charMap = new Map();
+  var charMap = {};
   fileContents.split("").forEach(c => {
     c = c.toLowerCase();
     if (".,;?!:-".includes(c))    // TODO: do it better
-      c = '.';
-    if (charMap.has(c))
-      charMap.set(c, charMap.get(c) + 1);
+      c = 'Punctuation';
+    if (charMap[c] !== undefined)
+      charMap[c]++;
     else
-      charMap.set(c, 1);
+      charMap[c] = 1;
   });
   return charMap;
 }
 
 function countProbability(charMap) {
-  var probMap = new Map();
-  var size = 0;
-  charMap.forEach((frequency, char, _) => size += frequency);
-  charMap.forEach((frequency, char, _) => {
-    probMap.set(char, frequency / size);
+  var probMap = {};
+  const size = Object.values(charMap).reduce((a, b) => a + b, 0);
+  Object.entries(charMap).forEach(([char, frequency]) => {
+    probMap[char] = frequency / size;
   });
   return probMap;
 }
