@@ -21,6 +21,7 @@ class App extends React.Component {
           </div>
           <table className="table">
             <tbody>
+              <tr><th colspan="2">Probabilities</th></tr>
                 { Object.keys(this.state.probabilities).sort().map((key) => (<tr><td>{key}</td><td>{this.state.probabilities[key].toFixed(3)}</td></tr>)) }
         </tbody>
       </table>
