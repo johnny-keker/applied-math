@@ -7,18 +7,22 @@ class App extends React.Component {
     super(props);
     this.state = {
       text: "",
-      charInfo: {}
+      charInfo: {},
+      fileEntropy: 0,
     };
   }
 
   render() {
     return (
       <div className="App">
-          <div className="container">
+        <div className="container">
+          <div>
           <div id="json-file-loader">
             <input type="file" ref="file" />
-          <button onClick={this.openFile}>Load File</button>
+            <button onClick={this.openFile}>Load File</button>
           </div>
+          <p>Total File Entropy: {this.state.fileEntropy.toFixed(4)}</p>
+        </div>
           <table className="table">
             <tbody>
               <tr><th>Char</th><th>Prob</th><th>Entropy</th></tr>
@@ -33,8 +37,8 @@ class App extends React.Component {
   openFile = async () => {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
-    const charInfo = getCharInfo(countChars(text));
-    this.setState({ charInfo });
+    const [charInfo, entropy] = getCharInfoAndEntropy(countChars(text));
+    this.setState({ charInfo : charInfo, fileEntropy : entropy });
   }
 }
 
@@ -69,14 +73,16 @@ function countChars(fileContents) {
   return charMap;
 }
 
-function getCharInfo(charMap) {
+function getCharInfoAndEntropy(charMap) {
   var probMap = {};
+  var entropy = 0;
   const size = Object.values(charMap).reduce((a, b) => a + b, 0);
   Object.entries(charMap).forEach(([char, frequency]) => {
     var prob = frequency / size;
     probMap[char] = [prob, Math.log(1 / prob)];
+    entropy -= prob * Math.log(prob);
   });
-  return probMap;
+  return [probMap, entropy];
 }
 
 export default App;

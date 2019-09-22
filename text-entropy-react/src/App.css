@@ -29,12 +29,3 @@ table, tr, td, th {
   border: 1px solid black;
   border-collapse: collapse;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
