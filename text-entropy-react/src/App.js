@@ -9,6 +9,7 @@ class App extends React.Component {
       text: "",
       charInfo: {},
       fileEntropy: 0,
+      pairEntropy: 0,
     };
   }
 
@@ -22,6 +23,7 @@ class App extends React.Component {
             <button onClick={this.openFile}>Load File</button>
           </div>
           <p>Total File Entropy: {this.state.fileEntropy.toFixed(4)}</p>
+          <p>Entropy H*: {this.state.pairEntropy.toFixed(4)}</p>
         </div>
           <table className="table">
             <tbody>
@@ -37,8 +39,10 @@ class App extends React.Component {
   openFile = async () => {
     const rawFile = await readFileAsync(this.refs.file.files[0]);
     const text = arrayBufferToString(rawFile);
-    const [charInfo, entropy] = getCharInfoAndEntropy(countChars(text));
-    this.setState({ charInfo : charInfo, fileEntropy : entropy });
+    const charMap = countChars(text);
+    const [charInfo, entropy] = getCharInfoAndEntropy(charMap);
+    const pairEntropy = getPairsEntropy(text, charInfo);
+    this.setState({ charInfo : charInfo, fileEntropy : entropy, pairEntropy : pairEntropy });
   }
 }
 
@@ -59,10 +63,8 @@ function countChars(fileContents) {
   var charMap = {};
   fileContents.split("").forEach(c => {
     c = c.toLowerCase();
-    if (!c.match(/[a-z]/i) && c !== " ")
-      c = 'Pnct';
-    if (c == " ")
-      c = "Spc";
+    if (!c.match(/[a-z0-9]/i) && c !== " ")
+      c = '.';
     if (c == "\n")
       return;
     if (charMap[c] !== undefined)
@@ -83,6 +85,29 @@ function getCharInfoAndEntropy(charMap) {
     entropy -= prob * Math.log(prob);
   });
   return [probMap, entropy];
+}
+
+function getPairsEntropy(fileContents, charProbs) {
+  fileContents = fileContents.replace("\n", "").toLowerCase();
+  var pairCount = {};
+  const size = fileContents.length - 1;
+  for (var i = 0; i < size; i++) {
+    var fChar = fileContents[i];
+    var sChar = fileContents[i+1];
+    if (!fChar.match(/[a-z0-9]/i) && fChar !== " ") fChar = ".";
+    if (!sChar.match(/[a-z0-9]/i) && sChar !== " ") sChar = ".";
+    var pair = fChar + sChar;
+    if (pairCount[pair] === undefined)
+      pairCount[pair] = 1;
+    else
+      pairCount[pair] += 1;
+  }
+  var pairEntropy = 0;
+  Object.entries(pairCount).forEach(([pair, frequency]) => {
+    var pairProb = frequency / size;
+    pairEntropy -= pairProb * charProbs[pair[1]][0] * Math.log2(pairProb);
+  });
+  return pairEntropy;
 }
 
 export default App;
