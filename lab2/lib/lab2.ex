@@ -17,17 +17,20 @@ defmodule Lab2 do
               |> Enum.uniq()
               |> Enum.map(fn x -> {x, (length(String.split(contents, x)) - 1) / String.length(contents)} end)
     
-    {left, right} = shenon_fano(probs, [], [])
-    
-    IO.puts("Left:")
-    left
-    |> Enum.each(fn {x, y} -> IO.puts("#{x} => #{y}") end)
-    IO.puts("Right:")
-    right
-    |> Enum.each(fn {x, y} -> IO.puts("#{x} => #{y}") end)
+    res = shenon_fano("", probs, [])
+    IO.inspect(res)
   end
 
-  def shenon_fano(data, left, right) do
+  def shenon_fano(key, data, acc) do
+    if length(data) == 1 do
+      [{key, data} | acc]
+    else
+      {left, right} = shenon_fano_separation(data, [], [])
+      shenon_fano("#{key}0", left, shenon_fano("#{key}1", right, acc))
+    end
+  end
+
+  def shenon_fano_separation(data, left, right) do
     if length(data) == 0 do
       {left, right}
     else
@@ -40,9 +43,9 @@ defmodule Lab2 do
                   |> Enum.map(fn {x, y} -> y end)
                   |> Enum.sum
       if sum_left < sum_right do
-        shenon_fano(rest, [element | left], right)
+        shenon_fano_separation(rest, [element | left], right)
       else
-        shenon_fano(rest, left, [element | right])
+        shenon_fano_separation(rest, left, [element | right])
       end
     end
   end
