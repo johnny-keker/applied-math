@@ -1,7 +1,4 @@
 defmodule Lab2 do
-  require IEx
-
-
   def main(args \\ []) do
     IO.puts("Hello stranger!")
     filename = IO.gets("Enter file name: ")
@@ -13,7 +10,7 @@ defmodule Lab2 do
         true
     end
 
-    contents = String.replace(contents, "\n", "")
+    contents = String.downcase(String.replace(String.replace(contents, "\n", ""), ~r/[[:punct:]]/, "."))
 
     probs = contents
               |> String.graphemes()
@@ -67,7 +64,6 @@ defmodule Lab2 do
     else
       {label1, prob1, ch11, ch12, checked} = ch1
       {label2, prob2, ch21, ch22, checked} = ch2
-      #IEx.pry
       huffman_code_generation(nodes, "#{curr_code}1", label1, huffman_code_generation(nodes, "#{curr_code}0", label2, acc))
     end
     
